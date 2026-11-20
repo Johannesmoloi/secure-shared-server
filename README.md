@@ -1,3 +1,4 @@
+![secure-shared-server](IMG-20261120-WA2373.jpg)
 # secure-shared-server
 
 Secure two companies sharing one web server. Docker isolation, Nginx, Fail2Ban, firewall and limits to stop cross-site attacks and noisy neighbour slowdowns.
