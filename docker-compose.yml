@@ -1,0 +1,91 @@
+services:
+  company-a:
+    image: wordpress:latest
+    container_name: company-a
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db-a:3306
+      WORDPRESS_DB_USER: user_a
+      WORDPRESS_DB_PASSWORD: ${DB_PASS_A}
+      WORDPRESS_DB_NAME: db_a
+    volumes:
+      - ./company-a:/var/www/html
+    networks:
+      - net-a
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+
+  db-a:
+    image: mysql:8.0
+    container_name: db-a
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASS_A}
+      MYSQL_DATABASE: db_a
+      MYSQL_USER: user_a
+      MYSQL_PASSWORD: ${DB_PASS_A}
+    volumes:
+      - db-a-data:/var/lib/mysql
+    networks:
+      - net-a
+
+  company-b:
+    image: wordpress:latest
+    container_name: company-b
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db-b:3306
+      WORDPRESS_DB_USER: user_b
+      WORDPRESS_DB_PASSWORD: ${DB_PASS_B}
+      WORDPRESS_DB_NAME: db_b
+    volumes:
+      - ./company-b:/var/www/html
+    networks:
+      - net-b
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+
+  db-b:
+    image: mysql:8.0
+    container_name: db-b
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASS_B}
+      MYSQL_DATABASE: db_b
+      MYSQL_USER: user_b
+      MYSQL_PASSWORD: ${DB_PASS_B}
+    volumes:
+      - db-b-data:/var/lib/mysql
+    networks:
+      - net-b
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - company-a
+      - company-b
+    networks:
+      - net-a
+      - net-b
+
+networks:
+  net-a:
+  net-b:
+
+volumes:
+  db-a-data:
+  db-b-data:
